@@ -1,0 +1,15 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# misc
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+anotaciones.txt
+/src/config.js
