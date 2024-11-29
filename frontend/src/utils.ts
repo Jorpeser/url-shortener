@@ -1,7 +1,6 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { NODE_ENV } from "../config"
-import { cookies } from "next/headers"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -48,11 +47,3 @@ export async function api_fetch(route: string, method: HTTPMethod, payload?: Rec
     throw Error("An error occurred communicating with server.")
   }
 }
-
-export const getCookie = () => {
-  console.log(document.cookie)
-}
-// export async function getSessionData(cookie_name: string) {
-//   const sessionData = cookies().get(cookie_name)?.value
-//   return sessionData ? JSON.parse(sessionData) : null
-// }
