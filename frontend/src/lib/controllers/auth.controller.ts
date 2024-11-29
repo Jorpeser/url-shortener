@@ -1,43 +1,53 @@
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { JWT_SECRET, NODE_ENV } from '../config.js'
-import { isEmail } from '../util.js'
-import { User } from '../models/User.model.js'
+import { JWT_SECRET } from '../../../config'
+import { isEmail } from '../../utils'
+import { User } from '@/lib/models/User.model'
+import { connectDB } from '../db'
+import { NextResponse } from 'next/server'
 
 // [/] Function to handle user registration
 /*  Registering takes email password and username 
     and creates a User DB item */
-export const register = async (req, res) => {
-    const { email, password, username } = req.body
-
+export const register = async (req: Request, res: Response) => {
     try {
+        const { email, password, username } = await req.json()
+
+        await connectDB()
 
         // Check if username already exists
         const sameUsername = await User.findOne({
             username: username,
         })
-        
         if (sameUsername) {
-            throw new Error('Username already in use')
+            return NextResponse.json(
+                { message: 'Username already in use' },
+                { status: 400 }
+            )
         }
 
         // Check if email already exists
         const sameEmail = await User.findOne({ email: email })
         if (sameEmail) {
-            throw new Error('Email already in use')
+            return NextResponse.json(
+                { message: 'Email already in use' },
+                { status: 400 }
+            )
         }
 
         // Check if password is valid
         if (!/(?=.*\d)(?=.*[A-Z]).{8,}/.test(password)) {
-            throw new Error(
-                'Password must be at least 8 characters long and contain at least one number and one capital letter'
+            return NextResponse.json(
+                { message: 'Password must be at least 8 characters long and contain at least one number and one capital letter'},
+                { status: 400 }
             )
         }
 
         // Hash the password
         const hashedPassword = bcrypt.hashSync(password, 10)
 
-        const newUser = new User({
+        // Create a new user
+        const newUser = await User.create({
             email: email,
             password: hashedPassword,
             username: username,
@@ -45,29 +55,28 @@ export const register = async (req, res) => {
             urls: [],
         })
 
-        await newUser.save()
-
-        res.status(201).json(newUser)
+        return NextResponse.json(
+            { message: 'User registered successfully'},
+            { status: 201 }
+        )
     } catch (err) {
-        console.log('Error en register: ' + err)
-        res.status(400).json({ message: err.message })
+        console.error('Error creating user: ' + err)
+        return NextResponse.json(
+            { message: 'Error creating user' },
+            { status: 500 }
+        )
     }
 }
 
 // [ ] Function to handle user login
-export const login = async (req, res) => {
-    // Extract email or username and password from request body
-    const { emailOrUsername, password } = req.body
-
+export const login = async (req: Request, res: Response) => {
     try {
-        let user
+    
+        const { emailOrUsername, password } = await req.json()
+        
+        await connectDB()
 
-        // Validate the provided password
-        if (!/(?=.*\d)(?=.*[A-Z]).{8,}/.test(password)) {
-            throw new Error(
-                'Password must be at least 8 characters long and contain at least one number and one capital letter'
-            )
-        }
+        let user
 
         // Validate the provided email or username and find the user
         if (isEmail(emailOrUsername)) {
@@ -80,13 +89,19 @@ export const login = async (req, res) => {
 
         // Check if the user exists
         if (!user) {
-            throw new Error('User not found')
+            return NextResponse.json(
+                { message: 'Invalid user and password combination' },
+                { status: 400 }
+            )
         }
 
         // Compare the provided password with the hashed password in the database
-        const validPassword = await bcrypt.compare(password, user.password)
+        const validPassword = await bcrypt.compare(password, user?.password)
         if (!validPassword) {
-            throw new Error('Invalid password')
+            return NextResponse.json(
+                { message: 'Invalid user and password combination' },
+                { status: 400 }
+            )
         }
 
         // Generate a JWT token
@@ -110,11 +125,11 @@ export const login = async (req, res) => {
 }
 
 // [ ] Function to handle user logout
-export const logout = async (req, res) => {
+export const logout = async (req: Request, res: Response) => {
     res.clearCookie('auth_token').json({ message: 'Logged out' })
 }
 
-export const me = async (req, res) => {
+export const me = async (req: Request, res: Response) => {
     const token = req.cookies.auth_token
     console.log("Token: ", token)
     //console.log("Request: ", req)

@@ -1,0 +1,16 @@
+New structure for the project (NextJS):
+
+url-shortener
+    /src
+        /app
+            layout.tsx
+            page.tsx
+            /login
+                page.tsx
+                route.tsx
+        /components
+        /backend
+    package.json
+    package-lock.json
+    .gitignore
+    ...

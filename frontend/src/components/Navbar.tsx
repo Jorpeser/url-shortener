@@ -3,6 +3,12 @@
 import Link from "next/link"
 import { Button } from "./ui/button"
 import DarkModeButton from "./DarkModeButton"
+//import { getSessionData } from "@/lib/utils"
+import { getCookie } from "@/utils"
+
+const handleCookie = () => {
+  getCookie()
+}
 
 export const Navbar = () => (
   <nav className="sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -14,6 +20,9 @@ export const Navbar = () => (
         </Link>
       </div>
       <div className="flex items-center justify-end flex-1 space-x-4">
+        <Button variant="ghost" onClick={handleCookie}>
+          Galleta
+        </Button>
         <Button variant="ghost" className="text-muted-foreground">
           <Link href="/login">Log in</Link>
         </Button>

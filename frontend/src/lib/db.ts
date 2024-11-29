@@ -1,18 +1,7 @@
-import { MONGO_URI } from './config.js'
 import mongoose from 'mongoose'
+import { MONGODB_URI } from '../../config'
 
-// export const startDB = async () => {
-//     // Mongoose connection
-//     await mongoose
-//         .connect(MONGO_URI)
-//         .then(async () => {
-//             console.log('\n\x1b[38;5;46mDatabase connection successful\x1b[0m' +' (' + MONGO_URI + ')' )})
-//         .catch((err) => {
-//             console.error(err)
-//         })
-// }
-
-if(!MONGO_URI) {
+if(!MONGODB_URI) {
     throw new Error('MongoDB_URI is not defined, check you config file')
 }
 
@@ -22,7 +11,7 @@ if (!cached) {
     cached = global.mongoose = { conn: null, promise: null }
 }
 
-export const startDB = async () => {
+export const connectDB = async () => {
 
     if (cached.conn) {
         return cached.conn
@@ -33,7 +22,7 @@ export const startDB = async () => {
             bufferCommands: false,
             autoIndex: false, 
         }
-        cached.promise = mongoose.connect(MONGO_URI, options).then((mongoose) => {
+        cached.promise = mongoose.connect(MONGODB_URI, options).then((mongoose) => {
             console.log('\n\x1b[38;5;46mDatabase connection successful\x1b[0m')
             return mongoose
         })
@@ -49,4 +38,3 @@ export const startDB = async () => {
 
     return cached.conn
 }
-

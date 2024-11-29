@@ -7,6 +7,7 @@ import  DarkModeButton from "@/components/DarkModeButton"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Check } from "lucide-react"
+import { api_fetch } from "@/utils"
 
 export default function Home() {
 
@@ -17,6 +18,13 @@ export default function Home() {
   }
 
   const handleShorten = () => {
+    api_fetch("/me", "GET").then((response) => {
+      if (response) {
+        console.log(response)
+      } else {
+        console.error("Failed to fetch user")
+      }
+    })
     console.log('Shortening...')
   }
 

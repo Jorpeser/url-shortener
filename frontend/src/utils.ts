@@ -1,9 +1,19 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { API_URL, NODE_ENV } from "@/config"
+import { NODE_ENV } from "../config"
+import { cookies } from "next/headers"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
+}
+
+/**
+ * Function to check if an email is regex valid
+ * @param {*} email string
+ * @returns boolean
+ */
+export function isEmail(email: string){
+  return /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)
 }
 
 type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE"
@@ -22,7 +32,7 @@ export async function api_fetch(route: string, method: HTTPMethod, payload?: Rec
   }
 
   try {
-    const response = await fetch(`${API_URL}${route}`, options)
+    const response = await fetch(`route`, options)
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -38,3 +48,11 @@ export async function api_fetch(route: string, method: HTTPMethod, payload?: Rec
     throw Error("An error occurred communicating with server.")
   }
 }
+
+export const getCookie = () => {
+  console.log(document.cookie)
+}
+// export async function getSessionData(cookie_name: string) {
+//   const sessionData = cookies().get(cookie_name)?.value
+//   return sessionData ? JSON.parse(sessionData) : null
+// }
