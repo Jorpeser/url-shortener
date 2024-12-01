@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link"
-
+import { useRouter } from "next/navigation"
 import { Icons } from "@/components/Icons"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,13 +12,14 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-
-import { api_fetch } from "@/utils"
-import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 export default function RegisterPage() {
+
+  const router = useRouter()
+
   // Form schema, restrictions and validation
   const formSchema = z.object({
     username: z
@@ -28,6 +29,7 @@ export default function RegisterPage() {
       .regex(/^[a-zA-Z0-9]+$/),
     email: z
       .string()
+      .toLowerCase()
       .regex(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/, "Invalid email format"),
     password: z
       .string()
@@ -36,6 +38,12 @@ export default function RegisterPage() {
         /(?=.*\d)(?=.*[A-Z])/,
         "Password must contain at least one uppercase letter and one number"
       ),
+    repeatPassword: z
+      .string()
+      
+  }).refine(data => data.password === data.repeatPassword, {
+    message: "Passwords must match",
+    path: ["repeatPassword"]
   })
 
   // Form definition
@@ -45,15 +53,49 @@ export default function RegisterPage() {
       username: "",
       email: "",
       password: "",
+      repeatPassword: "",
     },
   })
 
   // Form submit handler
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    await api_fetch("/register", "POST", values)
-    console.log(values)
+  async function onSubmitRegister(values: z.infer<typeof formSchema>) {
+    // Fetch API register endpoint
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    })
+    const result = await response.json()
+    console.log("Response", response)
+    console.log("Result", result)
+
+    // Handle success response
+    if (response.ok) {
+      console.log("Success", result)
+      router.push("/")
+      return
+    }
+
+    if (result.message.includes("Username")) {
+      form.setError("username", { message: result.message })
+      form.setFocus("username")
+      form.resetField("password")
+      form.resetField("repeatPassword")
+      return
+    }
+
+    if (result.message.includes("Email")) {
+      form.setError("email", { message: result.message })
+      form.setFocus("email")
+      form.resetField("password")
+      form.resetField("repeatPassword")
+      return
+    }
+
+    // Return to avoid default form behavior
+    return
   }
 
   return (
@@ -67,14 +109,14 @@ export default function RegisterPage() {
             {/* Register form */}
             <Form {...form}>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(onSubmitRegister)}
                 className="space-y-4"
               >
                 {/* Username form field */}
                 <FormField
                   control={form.control}
                   name="username"
-                  render={({ field }) => (
+                  render={({ field }: { field: any }) => (
                     <FormItem>
                       <FormLabel>Username</FormLabel>
                       <Input
@@ -92,7 +134,7 @@ export default function RegisterPage() {
                 <FormField
                   control={form.control}
                   name="email"
-                  render={({ field }) => (
+                  render={({ field }: { field: any }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <Input
@@ -110,13 +152,31 @@ export default function RegisterPage() {
                 <FormField
                   control={form.control}
                   name="password"
-                  render={({ field }) => (
+                  render={({ field }: { field: any }) => (
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <Input
                         id="password"
                         type="password"
                         placeholder="Password"
+                        required
+                        {...field}
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* Repeat password form field */}
+                <FormField
+                  control={form.control}
+                  name="repeatPassword"
+                  render={({ field }: { field: any }) => (
+                    <FormItem>
+                      <FormLabel>Repeat password</FormLabel>
+                      <Input
+                        id="repeatPassword"
+                        type="password"
+                        placeholder="Repeat Password"
                         required
                         {...field}
                       />
