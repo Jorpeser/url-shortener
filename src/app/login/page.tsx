@@ -17,8 +17,6 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-
-import { api_fetch } from "@/utils"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -27,18 +25,18 @@ import { useRouter } from "next/navigation"
 
 export default function LoginForm() {
 
-  const handleGoogleLogin = async () => {}
-  const handlegithubLogin = async () => {}
-
   const router = useRouter()
 
+  // Form schema, restrictions and validation
   const formSchema = z.object({
     emailOrUsername: z.string(),
-    password: z.string()
+    password: z
+      .string()
       .min(8, "Password must be at least 8 characters long")
       .regex(/(?=.*\d)(?=.*[A-Z])/, "Password must contain at least one uppercase letter and one number")
   })
 
+  // Form definition
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,17 +45,39 @@ export default function LoginForm() {
     },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
-    await api_fetch("/login", "POST", values).then((response) => {
-      if (response) {
-        // Redirect to the home page
-        //console.log(response)
-        router.push("/")
-      } else {
-        console.error("Login failed")
-      }
+  // Form submit handler
+  async function onSubmitLogin(values: z.infer<typeof formSchema>) {
+    // Fetch the API login route
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
     })
+    const result = await response.json()
+    console.log("Response:", response)
+    console.log("Result:", result)
+
+    // Handle success response
+    if (response.ok) {
+      // Redirect to dashboard
+      console.log("Redirecting to dashboard")
+      router.push("/home")
+      return
+    }
+
+    // Handle error response
+    if (response.status === 400) {
+      console.log("Bad request")
+      form.setError("emailOrUsername", {
+        type: "manual",
+        message: result.message,
+      })
+      form.setFocus("emailOrUsername")
+      form.resetField("password")
+      return
+    }
   }
 
   return (
@@ -71,11 +91,11 @@ export default function LoginForm() {
         <CardContent>
           <div className="grid gap-4">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={form.handleSubmit(onSubmitLogin)} className="space-y-4">
                 <FormField
                   control={form.control}
                   name="emailOrUsername"
-                  render={({ field }) => (
+                  render={({ field }: { field: any }) => (
                     <FormItem>
                       <FormLabel> Username or email </FormLabel>
                       <Input 
@@ -92,7 +112,7 @@ export default function LoginForm() {
                 <FormField
                   control={form.control}
                   name="password"
-                  render={({ field }) => (
+                  render={({ field }: { field: any }) => (
                     <FormItem>
                       <div className="flex items-center">
                         <FormLabel> Password </FormLabel>
