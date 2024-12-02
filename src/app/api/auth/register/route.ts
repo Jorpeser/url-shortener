@@ -4,7 +4,6 @@ import { register } from "@/lib/controllers/auth.controller";
 export async function POST(request: NextRequest) {
 
     const data = await request.json()
-    console.log("register data", data)
     
     if (!data) {
         return NextResponse.json(

@@ -56,20 +56,16 @@ export default function LoginForm() {
       body: JSON.stringify(values),
     })
     const result = await response.json()
-    console.log("Response:", response)
-    console.log("Result:", result)
 
     // Handle success response
     if (response.ok) {
       // Redirect to dashboard
-      console.log("Redirecting to dashboard")
       router.push("/home")
       return
     }
 
     // Handle error response
     if (response.status === 400) {
-      console.log("Bad request")
       form.setError("emailOrUsername", {
         type: "manual",
         message: result.message,

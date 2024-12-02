@@ -68,12 +68,9 @@ export default function RegisterPage() {
       body: JSON.stringify(values),
     })
     const result = await response.json()
-    console.log("Response", response)
-    console.log("Result", result)
 
     // Handle success response
     if (response.ok) {
-      console.log("Success", result)
       router.push("/")
       return
     }
