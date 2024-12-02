@@ -75,10 +75,11 @@ export const deleteSession = async () => {
 
 export const verifySession = cache(async () => {
     const cookiesStore = await cookies()
-    const session = await cookiesStore.get(cookieName)?.value
+    const session = cookiesStore.get(cookieName)?.value
     const payload = await decrypt(session)
 
     if (!payload?.userId) {
+        console.error('Error verifying session: userId not found')
         return NextResponse.redirect('/login', 403)
     }
 
