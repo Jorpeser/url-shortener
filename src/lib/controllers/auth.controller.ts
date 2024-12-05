@@ -69,7 +69,7 @@ export const register = async (data: any) => {
     }
 }
 
-// [ ] Function to handle user login
+// [X] Function to handle user login
 export const login = async (data: any) => {
     try {
         const { emailOrUsername, password } = data
@@ -120,23 +120,23 @@ export const login = async (data: any) => {
 }
 
 // [ ] Function to handle user logout
-export const logout = async (req: Request, res: Response) => {
+export const logout = async () => {
     try {
         // 1.- Delete the session
         await deleteSession()
 
         // 2.- Send success response
-        return NextResponse.json(
-            { message: 'Logged out successfully' },
-            { status: 200 }
-        )
+        return {
+            message: 'User logged out successfully',
+            status: 200
+        }
 
     } catch (err) {
         console.error('Error logging out: ' + err)
-        return NextResponse.json(
-            { message: 'Error logging out' },
-            { status: 500 }
-        )
+        return {
+            message: 'Error logging out',
+            status: 500
+        }
     }
 }
 
