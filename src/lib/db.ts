@@ -8,6 +8,7 @@ if(!MONGODB_URI) {
 let cached = global.mongoose
 
 if (!cached) {
+    console.log('Not cached connection')
     cached = global.mongoose = { conn: null, promise: null }
 }
 
