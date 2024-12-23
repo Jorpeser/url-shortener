@@ -1,4 +1,5 @@
 import 'server-only'
+
 import { cookies } from 'next/headers'
 import { SignJWT, jwtVerify } from 'jose'
 import { JWT_SECRET } from '../../config'
@@ -39,7 +40,7 @@ export const createSession = async (userId: string) => {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            maxAge: 1000 * 60 * 60 * 6, // 6 hours
+            maxAge: 60 * 60 * 6, // 6 hours
             path: '/'
         }
     )
@@ -62,7 +63,7 @@ export const updateSession = async () => {
             httpOnly: true,
             secure: true,
             sameSite: 'none',
-            maxAge: 1000 * 60 * 60 * 6, // 6 hours
+            maxAge: 60 * 60 * 6, // 6 hours
             path : '/'
         }
     )
@@ -80,7 +81,7 @@ export const verifySession = cache(async () => {
 
     if (!payload?.userId) {
         console.error('Error verifying session: userId not found')
-        return NextResponse.redirect('/login', 403)
+        return NextResponse.redirect('http://localhost:3000/login')
     }
 
     return { isAuth: true, userId: payload.userId }
