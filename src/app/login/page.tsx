@@ -61,6 +61,7 @@ export default function LoginForm() {
     if (response.ok) {
       // Redirect to dashboard
       router.push("/home")
+      router.refresh()
       return
     }
 
