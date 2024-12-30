@@ -6,10 +6,28 @@ export async function middleware(request: NextRequest) {
 
     const protected_routes = ['home']
 
-    // Habrá mejor forma de hacer esto
-    if (!cookie && protected_routes.includes(request.nextUrl.pathname.split('/')[1])) {
-        return NextResponse.rewrite(new URL('/login', request.url))
+    // si no está log
+    if (!cookie) {
+        // si intenta acceder ruta protegida redirigir a login
+        if(protected_routes.includes(request.nextUrl.pathname.split('/')[1])) {
+            return NextResponse.rewrite(new URL('/login', request.url))
+        }
+        return
     }
+
+    if(cookie) {
+        // si intenta acceder a login o register redirigir a home
+        // si intenta acceder a / redirigir a home
+        if(
+          request.nextUrl.pathname.split('/')[1] === 'login' ||
+          request.nextUrl.pathname.split('/')[1] === 'register' ||
+          request.nextUrl.pathname === '/'
+        ) {
+            return NextResponse.rewrite(new URL('/home', request.url))
+        }
+        return
+      }
+
 }
 
 export const config = {
