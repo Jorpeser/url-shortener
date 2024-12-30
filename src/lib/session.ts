@@ -81,7 +81,8 @@ export const verifySession = cache(async () => {
 
     if (!payload?.userId) {
         console.error('Error verifying session: userId not found')
-        return NextResponse.redirect('http://localhost:3000/login')
+        NextResponse.redirect(new URL('http://localhost:3000/login'))
+        return { isAuth: false, userId: null }
     }
 
     return { isAuth: true, userId: payload.userId }
