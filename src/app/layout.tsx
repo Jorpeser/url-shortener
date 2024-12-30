@@ -1,8 +1,10 @@
-import { Navbar } from "@/components/Navbar"
+import { Navbar } from "@/components/Navbar/Navbar"
+import { LoggedNavbar } from "@/components/Navbar/LoggedNavbar"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "../styles/globals.css"
 import { ThemeProvider } from "./theme-provider"
+import { verifySession } from "@/lib/session"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -11,11 +13,14 @@ export const metadata: Metadata = {
   description: "URL shortening web service",
 }
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export async function NavNav() {
+  const session = await verifySession()
+  const isAuth = session.isAuth
+  return isAuth ? <LoggedNavbar /> : <Navbar />
+}
+
+export default async function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
@@ -25,7 +30,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Navbar />
+          {
+            NavNav()
+          }
           <div className="mt-[-64px]">{children}</div>
         </ThemeProvider>
       </body>
