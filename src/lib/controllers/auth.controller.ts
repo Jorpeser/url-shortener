@@ -1,7 +1,7 @@
 "use server"
 
 import bcrypt from 'bcryptjs'
-import { isEmail } from '../../utils'
+import { isEmail } from "@/utils"
 import { User } from '@/lib/models/User.model'
 import { connectDB } from '../db'
 import { NextResponse } from 'next/server'
