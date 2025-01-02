@@ -20,7 +20,6 @@ export async function NavNav() {
 }
 
 export default async function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
-
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
@@ -30,10 +29,9 @@ export default async function RootLayout({children}: Readonly<{children: React.R
           enableSystem
           disableTransitionOnChange
         >
-          {
-            NavNav()
-          }
-          <div className="mt-[-64px]">{children}</div>
+            {/* { NavNav() } */}
+            <div className="mt-[-64px]">{children}</div>
+          
         </ThemeProvider>
       </body>
     </html>

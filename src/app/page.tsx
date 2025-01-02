@@ -7,8 +7,7 @@ import  DarkModeButton from "@/components/DarkModeButton"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Check } from "lucide-react"
-import { api_fetch } from "@/utils"
-
+import { Navbar } from "@/components/Navbar/Navbar"
 export default function Home() {
 
   const [inputValue, setInputValue] = useState('')
@@ -17,16 +16,7 @@ export default function Home() {
     setInputValue(e.target.value)
   }
 
-  const handleShorten = () => {
-    api_fetch("/me", "GET").then((response) => {
-      if (response) {
-        console.log(response)
-      } else {
-        console.error("Failed to fetch user")
-      }
-    })
-    console.log('Shortening...')
-  }
+  const handleShorten = () => {}
 
   const pricingPlans = [
     {
@@ -51,13 +41,14 @@ export default function Home() {
 
   return (
     <>
+    <Navbar />
     <section className="w-full min-h-screen flex items-center justify-center mt-[-64px]">
       <div className="container px-4 md:px-6 max-w-4xl text-center">
         <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl select-none">
           Share <span className="relative underline-animation" style={{color:"hsl(var(--accent-text))"}}>shorter</span>, share <span className="relative underline-animation" style={{color:"hsl(var(--accent-text))"}}>better</span>
         </h1>
         <p className="mt-4 text-xl text-muted-foreground select-none">
-          Generate a random shortened link to your content.
+          Generate a shortened link to your content.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Input
